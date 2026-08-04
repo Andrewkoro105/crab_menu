@@ -1,9 +1,5 @@
 use crab_menu::{
-    app::{CrabMenu, functions::get::BoxedGetAdapter, settings::Settings},
-    gets::files::{FileData, Files},
-    runs::shell::Shell,
-    strategies::adaptive_query_limiter::AdaptiveQueryLimiter,
-    views::list::List,
+    app::{CrabMenu, functions::get::BoxedGetAdapter, settings::Settings}, enters::first::First, gets::files::{FileData, Files}, runs::shell::Shell, strategies::adaptive_query_limiter::AdaptiveQueryLimiter, views::list::List
 };
 use iced::Theme;
 use std::{path::PathBuf, time::Duration};
@@ -44,6 +40,7 @@ fn main() {
                 target_time: Duration::from_millis(500),
                 delay_at_zero: Duration::from_millis(10000),
             },
+            First,
             "0".into(),
         ),
         CrabMenu::update,

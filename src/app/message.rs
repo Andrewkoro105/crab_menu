@@ -1,7 +1,7 @@
 use crate::app::{
     CrabMenu,
     element::Diagram,
-    functions::{get::BoxedGet, run::BoxedRun, strategy::BoxedStrategy, view::View},
+    functions::{enter::Enter, get::BoxedGet, run::BoxedRun, strategy::BoxedStrategy, view::View},
 };
 use iced::{Task, exit, widget::operation::focus};
 use tracing::error;
@@ -18,11 +18,12 @@ pub enum Message<R: BoxedRun, AE, AL, FD> {
         result: Vec<Diagram<R, AE, AL>>,
     },
     SetFocus(String),
+    Enter,
 }
 
 unsafe impl<R: BoxedRun, AE, AL, FD> Send for Message<R, AE, AL, FD> {}
 
-impl<R, AE, AL, G, V, S, FD> CrabMenu<R, AE, AL, G, V, S, FD>
+impl<R, AE, AL, G, V, S, FD, E> CrabMenu<R, AE, AL, G, V, S, FD, E>
 where
     R: BoxedRun + 'static,
     AE: 'static,
@@ -31,6 +32,7 @@ where
     V: View<R, AE, AL, FD>,
     S: BoxedStrategy,
     FD: 'static,
+    E: Enter<R, AE, AL>,
 {
     pub fn update(&mut self, message: Message<R, AE, AL, FD>) -> Task<Message<R, AE, AL, FD>> {
         match message {
@@ -60,6 +62,11 @@ where
                 Task::none()
             }
             Message::SetFocus(id) => focus(id),
+            Message::Enter => if let Some(run) = self.settings.enter.enter(&self.diagram) {
+                Task::done(Message::Run(Box::new(run)))
+            } else {
+                Task::none()
+            }
         }
     }
 }

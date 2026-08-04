@@ -6,32 +6,30 @@ pub mod view;
 
 use crate::app::{
     element::{Diagram, List},
-    functions::{get::BoxedGet, run::BoxedRun, strategy::BoxedStrategy, view::View},
+    functions::{enter::Enter, get::BoxedGet, run::BoxedRun, strategy::BoxedStrategy, view::View},
     message::Message,
     settings::Settings,
 };
 use iced::{
-    Subscription, Task,
-    application::BootFn,
-    futures::{SinkExt, stream::BoxStream},
-    stream,
+    Event, Subscription, Task, application::BootFn, event, futures::{SinkExt, stream::BoxStream}, keyboard::{self, Key, key::Named}, stream
 };
 use std::{collections::HashMap, hash::Hash, time::Instant};
 
-pub struct CrabMenu<R, AE, AL, G, V, S, FD>
+pub struct CrabMenu<R, AE, AL, G, V, S, FD, E>
 where
     R: BoxedRun,
     G: BoxedGet<R, AE, AL, FD>,
     V: View<R, AE, AL, FD>,
     S: BoxedStrategy,
+    E: Enter<R, AE, AL>,
 {
-    settings: Settings<R, AE, AL, G, V, S, FD>,
+    settings: Settings<R, AE, AL, G, V, S, FD, E>,
     diagram: Diagram<R, AE, AL>,
     find: HashMap<usize, FD>,
 }
 
-impl<R, AE, AL, G, V, S, FD> BootFn<CrabMenu<R, AE, AL, G, V, S, FD>, Message<R, AE, AL, FD>>
-    for Settings<R, AE, AL, G, V, S, FD>
+impl<R, AE, AL, G, V, S, FD, E> BootFn<CrabMenu<R, AE, AL, G, V, S, FD, E>, Message<R, AE, AL, FD>>
+    for Settings<R, AE, AL, G, V, S, FD, E>
 where
     R: BoxedRun + Clone + 'static,
     AE: Clone + 'static,
@@ -40,11 +38,12 @@ where
     V: View<R, AE, AL, FD> + Clone,
     S: BoxedStrategy + Clone,
     FD: Clone + Default + 'static,
+    E: Enter<R, AE, AL> + Clone + 'static,
 {
     fn boot(
         &self,
     ) -> (
-        CrabMenu<R, AE, AL, G, V, S, FD>,
+        CrabMenu<R, AE, AL, G, V, S, FD, E>,
         iced::Task<Message<R, AE, AL, FD>>,
     ) {
         (
@@ -66,7 +65,7 @@ where
     }
 }
 
-impl<R, AE, AL, G, V, S, FD> CrabMenu<R, AE, AL, G, V, S, FD>
+impl<R, AE, AL, G, V, S, FD, E> CrabMenu<R, AE, AL, G, V, S, FD, E>
 where
     R: BoxedRun + Send + Clone + 'static,
     AE: Send + Clone + 'static,
@@ -75,19 +74,32 @@ where
     V: View<R, AE, AL, FD> + Clone + 'static,
     S: BoxedStrategy + std::hash::Hash + Send + Clone + 'static,
     FD: Hash + Send + Clone + 'static,
+    E: Enter<R, AE, AL> + Send + Clone + 'static,
 {
     pub fn subscription(&self) -> Subscription<Message<R, AE, AL, FD>> {
-        Subscription::batch(self.find.iter().map(|(id, data)| {
-            Subscription::run_with(
+        Subscription::batch(vec![
+            event::listen_with(|event, status, _| match (event, status) {
                 (
-                    id.clone(),
-                    data.clone(),
-                    self.settings.geter.clone(),
-                    self.settings.strategy.clone(),
-                ),
-                CrabMenu::<R, AE, AL, G, V, S, FD>::find,
-            )
-        }))
+                    Event::Keyboard(keyboard::Event::KeyPressed {
+                        key: Key::Named(Named::Enter),
+                        ..
+                    }),
+                    event::Status::Ignored,
+                ) => Some(Message::Enter),
+                _ => None,
+            }),
+            Subscription::batch(self.find.iter().map(|(id, data)| {
+                Subscription::run_with(
+                    (
+                        id.clone(),
+                        data.clone(),
+                        self.settings.geter.clone(),
+                        self.settings.strategy.clone(),
+                    ),
+                    CrabMenu::<R, AE, AL, G, V, S, FD, E>::find,
+                )
+            })),
+        ])
     }
 
     fn find(data: &(usize, FD, G, S)) -> BoxStream<'static, Message<R, AE, AL, FD>> {
