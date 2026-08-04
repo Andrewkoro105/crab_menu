@@ -3,7 +3,7 @@ use crate::app::{
     functions::{get::Get, run::BoxedRun},
 };
 use std::path::{Path, PathBuf};
-use tracing::{debug, error};
+use tracing::error;
 
 #[derive(Clone, Hash)]
 pub struct Files<R: BoxedRun> {
@@ -83,12 +83,12 @@ impl<R: BoxedRun> Get<R, FileData, FileData, String> for Files<R> {
                     .unwrap()
                     .to_string_lossy()
                     .into_owned();
-                (find_data.is_empty() || file_name
-                    .starts_with(find_data))
-                    .then_some(Diagram::Element(Element {
+                (find_data.is_empty() || file_name.starts_with(find_data)).then_some(
+                    Diagram::Element(Element {
                         run: (self.run)(&data),
                         additional_data: data,
-                    }))
+                    }),
+                )
             })
             .skip(start)
             .take(target_count)

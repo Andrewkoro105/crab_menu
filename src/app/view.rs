@@ -1,8 +1,9 @@
-use iced::Element;
-
 use crate::app::{
-    CrabMenu, functions::{get::BoxedGet, run::BoxedRun, strategy::BoxedStrategy, view::View}, message::Message
+    CrabMenu,
+    functions::{get::BoxedGet, run::BoxedRun, strategy::BoxedStrategy, view::View},
+    message::Message,
 };
+use iced::Element;
 
 impl<R, AE, AL, G, V, S, FD> CrabMenu<R, AE, AL, G, V, S, FD>
 where

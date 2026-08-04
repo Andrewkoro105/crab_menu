@@ -3,13 +3,13 @@ use crate::app::{
     functions::{run::BoxedRun, view::View},
     message::Message,
 };
-use iced::{Element, widget::Id};
+use iced::Element;
 use iced::widget::{Column, button, column, row, text, text_input};
 use std::collections::HashMap;
 
 #[derive(Clone)]
 pub struct List<AE, FD> {
-    pub view: fn(&AE) -> String,
+    pub view_elem: fn(&AE) -> String,
     pub to_find_data: fn(&String) -> FD,
     pub find_data_to_string: fn(&FD) -> String,
 }
@@ -44,7 +44,7 @@ where
             .spacing(5)
             .padding(10)
             .into(),
-            Diagram::Element(element) => button(text!("{}", (self.view)(&element.additional_data)))
+            Diagram::Element(element) => button(text!("{}", (self.view_elem)(&element.additional_data)))
                 .on_press(Message::Run(Box::new(element.run.clone())))
                 .into(),
         }

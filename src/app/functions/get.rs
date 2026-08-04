@@ -1,6 +1,5 @@
-use std::pin::Pin;
-
 use crate::app::{element::Diagram, functions::run::BoxedRun};
+use std::pin::Pin;
 
 pub trait Get<R: BoxedRun, AE, AL, FD> {
     fn get(

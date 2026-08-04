@@ -1,7 +1,14 @@
-use std::{collections::HashMap, hash::Hash, time::Instant};
+pub mod element;
+pub mod functions;
+pub mod message;
+pub mod settings;
+pub mod view;
 
 use crate::app::{
-    element::{Diagram, List}, functions::{get::BoxedGet, run::BoxedRun, strategy::BoxedStrategy, view::View}, message::Message, settings::Settings
+    element::{Diagram, List},
+    functions::{get::BoxedGet, run::BoxedRun, strategy::BoxedStrategy, view::View},
+    message::Message,
+    settings::Settings,
 };
 use iced::{
     Subscription, Task,
@@ -9,11 +16,7 @@ use iced::{
     futures::{SinkExt, stream::BoxStream},
     stream,
 };
-pub mod element;
-pub mod functions;
-pub mod message;
-pub mod settings;
-pub mod view;
+use std::{collections::HashMap, hash::Hash, time::Instant};
 
 pub struct CrabMenu<R, AE, AL, G, V, S, FD>
 where
@@ -38,18 +41,27 @@ where
     S: BoxedStrategy + Clone,
     FD: Clone + Default + 'static,
 {
-    fn boot(&self) -> (CrabMenu<R, AE, AL, G, V, S, FD>, iced::Task<Message<R, AE, AL, FD>>) {
+    fn boot(
+        &self,
+    ) -> (
+        CrabMenu<R, AE, AL, G, V, S, FD>,
+        iced::Task<Message<R, AE, AL, FD>>,
+    ) {
         (
             CrabMenu {
                 settings: self.clone(),
                 diagram: Diagram::List(List {
                     id: 0,
                     additional_data: Default::default(),
-                    data: vec![]
+                    data: vec![],
                 }),
                 find: HashMap::new(),
             },
-            Task::done(Message::Find { id: 0, data: FD::default() }).chain(Task::done(Message::SetFocus(self.start_id.clone()))),
+            Task::done(Message::Find {
+                id: 0,
+                data: FD::default(),
+            })
+            .chain(Task::done(Message::SetFocus(self.start_id.clone()))),
         )
     }
 }
@@ -87,7 +99,9 @@ where
                 let start = Instant::now();
                 let result = getter.get(&find_data, id, get_start, target_count).await;
                 get_start += result.len();
-                target_count = strategy.get_target_count(id, target_count, result.len(), start.elapsed()).await;
+                target_count = strategy
+                    .get_target_count(id, target_count, result.len(), start.elapsed())
+                    .await;
                 output
                     .send(Message::FindResult { id, result })
                     .await

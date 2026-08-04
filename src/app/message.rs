@@ -1,9 +1,10 @@
 use crate::app::{
     CrabMenu,
-    element::Diagram, functions::{get::BoxedGet, run::BoxedRun, strategy::BoxedStrategy, view::View},
+    element::Diagram,
+    functions::{get::BoxedGet, run::BoxedRun, strategy::BoxedStrategy, view::View},
 };
-use iced::{Task, widget::{operation::focus, text_input}};
-use tracing::{debug, error};
+use iced::{Task, widget::operation::focus};
+use tracing::error;
 
 #[derive(Clone)]
 pub enum Message<R: BoxedRun, AE, AL, FD> {
@@ -16,7 +17,7 @@ pub enum Message<R: BoxedRun, AE, AL, FD> {
         id: usize,
         result: Vec<Diagram<R, AE, AL>>,
     },
-    SetFocus(String)
+    SetFocus(String),
 }
 
 unsafe impl<R: BoxedRun, AE, AL, FD> Send for Message<R, AE, AL, FD> {}
@@ -33,9 +34,7 @@ where
 {
     pub fn update(&mut self, message: Message<R, AE, AL, FD>) -> Task<Message<R, AE, AL, FD>> {
         match message {
-            Message::Run(run) => {
-                Task::future(async move {run.run().await}).discard()
-            }
+            Message::Run(run) => Task::future(async move { run.run().await }).discard(),
             Message::Find { id, data } => {
                 if let Some(list) = self.diagram.find_list_mut(id) {
                     list.data.clear();
@@ -53,9 +52,7 @@ where
                 }
                 Task::none()
             }
-            Message::SetFocus(id) => {
-                focus(id)
-            }
+            Message::SetFocus(id) => focus(id),
         }
     }
 }

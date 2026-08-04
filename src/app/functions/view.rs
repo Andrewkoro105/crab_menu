@@ -1,8 +1,6 @@
-use std::collections::HashMap;
-
-use iced::Element;
-
 use crate::app::{element::Diagram, functions::run::BoxedRun, message::Message};
+use iced::Element;
+use std::collections::HashMap;
 
 pub trait View<R: BoxedRun, AE, AL, FD> {
     fn view<'element>(

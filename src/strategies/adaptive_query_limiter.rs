@@ -1,6 +1,5 @@
-use std::time::Duration;
-
 use crate::app::functions::strategy::Strategy;
+use std::time::Duration;
 
 #[derive(Clone, Hash)]
 pub struct AdaptiveQueryLimiter {

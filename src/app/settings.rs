@@ -1,6 +1,5 @@
-use std::marker::PhantomData;
-
 use crate::app::functions::{get::BoxedGet, run::BoxedRun, strategy::BoxedStrategy, view::View};
+use std::marker::PhantomData;
 
 #[derive(Clone)]
 pub struct Settings<R, AE, AL, G, V, S, FD>
