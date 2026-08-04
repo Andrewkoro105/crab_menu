@@ -20,7 +20,7 @@ impl Run for Shell {
         }
     }
     
-    fn close_id(&self) -> bool {
+    fn close_it(&self) -> bool {
         self.close_it
     }
 }

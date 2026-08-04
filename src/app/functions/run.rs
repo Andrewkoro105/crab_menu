@@ -3,13 +3,13 @@ use std::pin::Pin;
 pub trait Run: Send + Sync + Clone {
     fn run(&self) -> impl Future<Output = ()> + Send;
 
-    fn close_id(&self) -> bool;
+    fn close_it(&self) -> bool;
 }
 
 pub trait BoxedRun: Send + Sync {
     fn run<'future>(&'future self) -> Pin<Box<dyn Future<Output = ()> + Send + 'future>>;
 
-    fn close_id(&self) -> bool;
+    fn close_it(&self) -> bool;
 
     fn clone_box(&self) -> Box<dyn BoxedRun>;
 }
@@ -19,8 +19,8 @@ impl<T: Run + 'static> BoxedRun for T {
         Box::pin(<Self as Run>::run(&self))
     }
 
-    fn close_id(&self) -> bool {
-        <Self as Run>::close_id(&self)
+    fn close_it(&self) -> bool {
+        <Self as Run>::close_it(&self)
     }
 
     fn clone_box(&self) -> Box<dyn BoxedRun> {
@@ -33,8 +33,8 @@ impl BoxedRun for Box<dyn BoxedRun> {
         self.as_ref().run()
     }
 
-    fn close_id(&self) -> bool {
-        self.as_ref().close_id()
+    fn close_it(&self) -> bool {
+        self.as_ref().close_it()
     }
 
     fn clone_box(&self) -> Box<dyn BoxedRun> {

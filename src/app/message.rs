@@ -3,7 +3,7 @@ use crate::app::{
     element::Diagram,
     functions::{get::BoxedGet, run::BoxedRun, strategy::BoxedStrategy, view::View},
 };
-use iced::{Task, widget::operation::focus};
+use iced::{Task, exit, widget::operation::focus};
 use tracing::error;
 
 #[derive(Clone)]
@@ -34,7 +34,14 @@ where
 {
     pub fn update(&mut self, message: Message<R, AE, AL, FD>) -> Task<Message<R, AE, AL, FD>> {
         match message {
-            Message::Run(run) => Task::future(async move { run.run().await }).discard(),
+            Message::Run(run) => {
+                let close_it = run.close_it();
+                Task::future(async move { run.run().await }).discard().chain(if close_it {
+                    exit()
+                } else {
+                    Task::none()
+                })
+            },
             Message::Find { id, data } => {
                 if let Some(list) = self.diagram.find_list_mut(id) {
                     list.data.clear();
