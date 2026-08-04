@@ -1,19 +1,17 @@
 use iced::Element;
 
 use crate::app::{
-    CrabMenu,
-    function::{Get, Run, Strategy, Viewer},
-    message::Message,
+    CrabMenu, functions::{get::BoxedGet, run::BoxedRun, strategy::BoxedStrategy, view::View}, message::Message
 };
 
-impl<R, AE, AL, G, V, S> CrabMenu<R, AE, AL, G, V, S>
+impl<R, AE, AL, G, V, S, FD> CrabMenu<R, AE, AL, G, V, S, FD>
 where
-    R: Run,
-    G: Get<R, AE, AL>,
-    V: Viewer<R, AE, AL>,
-    S: Strategy,
+    R: BoxedRun,
+    G: BoxedGet<R, AE, AL, FD>,
+    V: View<R, AE, AL, FD>,
+    S: BoxedStrategy,
 {
-    pub fn view(&self) -> Element<'_, Message<R, AE, AL>> {
-        self.settings.viever.view(&self.diagram)
+    pub fn view(&self) -> Element<'_, Message<R, AE, AL, FD>> {
+        self.settings.viever.view(&self.diagram, &self.find)
     }
 }

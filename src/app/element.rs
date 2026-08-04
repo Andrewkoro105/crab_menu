@@ -1,25 +1,28 @@
-use crate::app::function::Run;
+use crate::app::functions::run::BoxedRun;
 
-pub enum Diagram<R: Run, AE, AL> {
+#[derive(Clone)]
+pub enum Diagram<R: BoxedRun, AE, AL> {
     List(List<AL, Self>),
     Element(Element<R, AE>),
 }
 
+#[derive(Clone)]
 pub struct List<AL, T> {
     pub id: usize,
     pub additional_data: AL,
     pub data: Vec<T>,
 }
 
-pub struct Element<R: Run, AE> {
+#[derive(Clone)]
+pub struct Element<R: BoxedRun, AE> {
     pub additional_data: AE,
     pub run: R,
 }
 
-unsafe impl<R: Run, AE, AL> Send for Diagram<R, AE, AL> {}
+unsafe impl<R: BoxedRun, AE, AL> Send for Diagram<R, AE, AL> {}
 unsafe impl<AL, T> Send for List<AL, T> {}
 
-impl<R: Run, AE, AL> Diagram<R, AE, AL> {
+impl<R: BoxedRun, AE, AL> Diagram<R, AE, AL> {
     pub fn find_list_mut(&mut self, find_id: usize) -> Option<&mut List<AL, Diagram<R, AE, AL>>> {
         match self {
             Diagram::List(list) => {

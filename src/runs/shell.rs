@@ -1,0 +1,26 @@
+use tokio::process::Command;
+use tracing::{debug, error, info};
+
+use crate::app::functions::run::Run;
+
+#[derive(Clone, Hash)]
+pub struct Shell {
+    pub script: String,
+    pub close_it: bool,
+}
+
+impl Run for Shell {
+    async fn run(&self) {
+        // let result = Command::new(self.script.clone()).output().await;
+        // match result {
+        //     Ok(output) => info!("Run output: {output:?}"),
+        //     Err(err) => error!("Run error: {err}"),
+        // }
+
+        debug!("run");
+    }
+    
+    fn close_id(&self) -> bool {
+        self.close_it
+    }
+}
