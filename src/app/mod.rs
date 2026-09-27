@@ -11,7 +11,12 @@ use crate::app::{
     settings::Settings,
 };
 use iced::{
-    Event, Subscription, Task, application::BootFn, event, futures::{SinkExt, stream::BoxStream}, keyboard::{self, Key, key::Named}, stream
+    Event, Subscription, Task,
+    application::BootFn,
+    event,
+    futures::{SinkExt, stream::BoxStream},
+    keyboard::{self, Key, key::Named},
+    stream,
 };
 use std::{collections::HashMap, hash::Hash, time::Instant};
 

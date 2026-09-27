@@ -1,5 +1,10 @@
 use crab_menu::{
-    app::{CrabMenu, functions::get::BoxedGetAdapter, settings::Settings}, enters::first::First, gets::files::{FileData, Files}, runs::shell::Shell, strategies::adaptive_query_limiter::AdaptiveQueryLimiter, views::list::List
+    app::{CrabMenu, functions::get::BoxedGetAdapter, settings::Settings},
+    enters::first::First,
+    gets::files::{FileData, Files},
+    runs::shell::Shell,
+    strategies::adaptive_query_limiter::AdaptiveQueryLimiter,
+    views::list::List,
 };
 use iced::Theme;
 use std::{path::PathBuf, time::Duration};
@@ -18,7 +23,7 @@ fn main() {
 
     iced::application(
         Settings::new(
-            BoxedGetAdapter(Files::new(PathBuf::from("./"), true, |data| Shell {
+            BoxedGetAdapter(Files::new(PathBuf::from("/nix/store"), true, |data| Shell {
                 shell: "sh".into(),
                 args: vec!["-c".into()],
                 close_it: true,

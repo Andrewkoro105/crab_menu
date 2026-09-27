@@ -1,19 +1,19 @@
 use crate::app::functions::run::BoxedRun;
 
-#[derive(Clone)]
+#[derive(Clone, Hash)]
 pub enum Diagram<R: BoxedRun, AE, AL> {
     List(List<AL, Self>),
     Element(Element<R, AE>),
 }
 
-#[derive(Clone)]
+#[derive(Clone, Hash)]
 pub struct List<AL, T> {
     pub id: usize,
     pub additional_data: AL,
     pub data: Vec<T>,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Hash)]
 pub struct Element<R: BoxedRun, AE> {
     pub additional_data: AE,
     pub run: R,

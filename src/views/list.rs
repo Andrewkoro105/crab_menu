@@ -4,8 +4,9 @@ use crate::app::{
     message::Message,
 };
 use iced::Element;
-use iced::widget::{Column, button, column, row, text, text_input};
-use std::collections::HashMap;
+use iced::widget::{button, column, row, text, text_input};
+use iced_helper::widgets::virtualized_list::virtualized_list;
+use std::{collections::HashMap, hash::Hash};
 
 #[derive(Clone)]
 pub struct List<AE, FD> {
@@ -16,9 +17,9 @@ pub struct List<AE, FD> {
 
 impl<R, AE, AL, FD> View<R, AE, AL, FD> for List<AE, FD>
 where
-    R: BoxedRun + Clone + 'static,
-    AE: Clone + 'static,
-    AL: Clone + 'static,
+    R: BoxedRun + Hash + Clone + 'static,
+    AE: Hash + Clone + 'static,
+    AL: Hash + Clone + 'static,
     FD: Clone + 'static,
 {
     fn view<'element>(
@@ -39,14 +40,24 @@ where
                 } else {
                     Element::from(row![])
                 },
-                Column::from_iter(list.data.iter().map(|data| self.view(data, finds))).spacing(5)
+                if !list.data.is_empty() {
+                    virtualized_list(&list.data)
+                        .context((self, finds))
+                        .get_elem(|data, _, (this, finds)| this.view(data, finds))
+                        .spacing(10)
+                        .into()
+                } else {
+                    Element::from(row![])
+                }
             ]
             .spacing(5)
             .padding(10)
             .into(),
-            Diagram::Element(element) => button(text!("{}", (self.view_elem)(&element.additional_data)))
-                .on_press(Message::Run(Box::new(element.run.clone())))
-                .into(),
+            Diagram::Element(element) => {
+                button(text!("{}", (self.view_elem)(&element.additional_data)))
+                    .on_press(Message::Run(Box::new(element.run.clone())))
+                    .into()
+            }
         }
     }
 }

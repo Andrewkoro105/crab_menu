@@ -3,7 +3,7 @@ use crate::app::{
     functions::{get::Get, run::BoxedRun},
 };
 use std::path::{Path, PathBuf};
-use tracing::error;
+use tracing::{debug, error};
 
 #[derive(Clone, Hash)]
 pub struct Files<R: BoxedRun> {
@@ -49,6 +49,7 @@ impl<R: BoxedRun> Files<R> {
                     })
                     .collect::<Vec<_>>();
                 result.sort_by(|a, b| a.path.cmp(&b.path));
+                //debug!("", re)
                 result
             }
             Err(err) => {

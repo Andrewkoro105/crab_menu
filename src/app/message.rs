@@ -3,7 +3,7 @@ use crate::app::{
     element::Diagram,
     functions::{enter::Enter, get::BoxedGet, run::BoxedRun, strategy::BoxedStrategy, view::View},
 };
-use iced::{Task, exit, widget::operation::focus};
+use iced::{Task, exit, widget::operation::focus, window};
 use tracing::error;
 
 #[derive(Clone)]
@@ -59,6 +59,7 @@ where
                 } else {
                     error!("There is no entry with ID {}", id);
                 }
+                //window::latest().and_then(|id| window::size(id)).map(Message::WindowSize)
                 Task::none()
             }
             Message::SetFocus(id) => focus(id),
